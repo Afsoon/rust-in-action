@@ -1,13 +1,30 @@
-extern create regex;
+extern crate regex;
+extern crate clap;
+
+use regex::Regex;
+use clap::{App,Arg};
+
 fn main() {
-    let search_term = "picture";
+    let args = App::new("grep-lite")
+        .version("0.1")
+        .about("search for patterns")
+        .arg(Arg::with_name("pattern")
+            .help("The pattern to search for")
+            .takes_value(true)
+            .required(true))
+        .get_matches();
+
+    let pattern = args.value_of("pattern").unwrap();
+    let re = Regex::new(pattern).unwrap();
+
     let quote = "Every face, every shop, bedroom window, public-house, and
-    dark square is a picture feverishly turned--in search of what?
-    It is the same with books. What do we seek through millions of pages?";
+dark square is a picture feverishly turned--in search of what?
+It is the same with books. What do we seek through millions of pages?";
 
     for line in quote.lines() {
-        if line.contains(search_term) {
-            println!("{}" line);
+        match re.find(quote) {
+            Some(_) => println!("{}", line),
+            None => (), //() es un placeholder de null
         }
     }
 }
